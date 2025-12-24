@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Polish Common Phrases -->
+    <string-array name="polish_phrases">
+        <item>Dzień dobry</item>
+        <item>Do widzenia</item>
+        <item>Proszę</item>
+        <item>Dziękuję</item>
+        <item>Przepraszam</item>
+        <item>Tak</item>
+        <item>Nie</item>
+        <item>Jak się masz?</item>
+        <item>Dobrze, dziękuję</item>
+        <item>Nie rozumiem</item>
+        <item>Gdzie jest...?</item>
+        <item>Ile to kosztuje?</item>
+        <item>Na zdrowie!</item>
+        <item>Smacznego!</item>
+        <item>Wszystkiego najlepszego!</item>
+    </string-array>
+
+    <!-- Polish Common Sentences -->
+    <string-array name="polish_sentences">
+        <item>Jak mogę ci pomóc?</item>
+        <item>Gdzie jest najbliższa stacja benzynowa?</item>
+        <item>Czy mówisz po angielsku?</item>
+        <item>Potrzebuję pomocy</item>
+        <item>Jestem zagubiony</item>
+        <item>Kiedy odjeżdża następny pociąg?</item>
+        <item>Chciałbym zamówić...</item>
+        <item>Mogę prosić rachunek?</item>
+        <item>Gdzie jest toaleta?</item>
+        <item>Dziś jest ładna pogoda</item>
+        <item>Co polecasz?</item>
+        <item>To bardzo miłe z twojej strony</item>
+        <item>Do zobaczenia później</item>
+        <item>Mam na imię...</item>
+        <item>Skąd jesteś?</item>
+    </string-array>
+</resources>

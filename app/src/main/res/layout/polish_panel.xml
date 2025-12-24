@@ -1,0 +1,25 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12dp">
+
+    <TextView
+        android:text="Polish suggestions"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/polish_item_1"
+        android:text="Please let me know your availability."
+        android:padding="10dp"
+        android:background="?android:attr/selectableItemBackground"/>
+
+    <TextView
+        android:id="@+id/polish_item_2"
+        android:text="I will get back to you shortly."
+        android:padding="10dp"
+        android:background="?android:attr/selectableItemBackground"/>
+</LinearLayout>
