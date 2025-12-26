@@ -687,10 +687,6 @@ public final class InputLogic {
             case KeyCode.SETTINGS:
                 onSettingsKeyPressed();
                 break;
-            case KeyCode.POLISH:
-                mLatinIME.showPolishPanel();
-                inputTransaction.setRequiresUpdateSuggestions();
-               break;
             case KeyCode.ACTION_NEXT:
                 performEditorAction(EditorInfo.IME_ACTION_NEXT);
                 break;
@@ -709,6 +705,9 @@ public final class InputLogic {
                 }
                 break;
             case KeyCode.CLIPBOARD_PASTE:
+                handleClipboardPaste();
+                break;
+            case KeyCode.POLISH:
                 handleClipboardPaste();
                 break;
             case KeyCode.SHIFT_ENTER:

@@ -82,7 +82,6 @@ import helium314.keyboard.latin.utils.SubtypeState;
 import helium314.keyboard.latin.utils.ToolbarMode;
 import helium314.keyboard.settings.SettingsActivity2;
 import kotlin.Unit;
-import helium314.keyboard.keyboard.polish.PolishPanelView;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -132,8 +131,6 @@ public class LatinIME extends InputMethodService implements
     private View mInputView;
     private InsetsOutlineProvider mInsetsUpdater;
     private SuggestionStripView mSuggestionStripView;
-    private PolishPanelView mPolishPanelView;
-
     private RichInputMethodManager mRichImm;
     final KeyboardSwitcher mKeyboardSwitcher;
     private final SubtypeState mSubtypeState = new SubtypeState((InputMethodSubtype subtype) -> { switchToSubtype(subtype); return Unit.INSTANCE; });
@@ -733,19 +730,8 @@ public class LatinIME extends InputMethodService implements
         Log.d(TAG, "onInitializeInterface");
         mKeyboardSwitcher.updateKeyboardTheme(mDisplayContext);
     }
-public void showPolishPanel() {
-    if (mPolishPanelView == null) return;
 
-    mSuggestionStripView.setVisibility(View.GONE);
-    mPolishPanelView.setVisibility(View.VISIBLE);
-}
 
-public void hidePolishPanel() {
-    if (mPolishPanelView == null) return;
-
-    mPolishPanelView.setVisibility(View.GONE);
-    mSuggestionStripView.setVisibility(View.VISIBLE);
-}
 
 @Override
 public View onCreateInputView() {

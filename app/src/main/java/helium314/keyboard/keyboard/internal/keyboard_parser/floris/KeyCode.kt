@@ -183,7 +183,7 @@ object KeyCode {
     const val SEND_INTENT_ONE =            -20000
     const val SEND_INTENT_TWO =            -20001
     const val SEND_INTENT_THREE =          -20002
-    const val POLISH =                     -12001
+    const val POLISH = -1001
 
     /** to make sure a FlorisBoard code works when reading a JSON layout */
     fun Int.checkAndConvertCode(): Int = if (this > 0) this else when (this) {
