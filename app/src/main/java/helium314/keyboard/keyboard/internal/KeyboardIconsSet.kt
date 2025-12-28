@@ -129,7 +129,6 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.NUMPAD -> R.drawable.sym_keyboard_numpad_key_holo
                     ToolbarKey.UNDO -> R.drawable.ic_undo
                     ToolbarKey.REDO -> R.drawable.ic_redo
-                    ToolbarKey.POLISH ->  R.drawable.ic_polish
                     ToolbarKey.SETTINGS -> R.drawable.sym_keyboard_settings_holo
                     ToolbarKey.SELECT_ALL -> R.drawable.ic_select_all
                     ToolbarKey.SELECT_WORD -> R.drawable.ic_select
@@ -140,6 +139,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.INCOGNITO -> R.drawable.sym_keyboard_incognito_holo
                     ToolbarKey.AUTOCORRECT -> R.drawable.ic_autocorrect
                     ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_holo
+                    ToolbarKey.AI -> R.drawable.ic_polish
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_holo
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left
@@ -190,7 +190,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.CLIPBOARD -> R.drawable.sym_keyboard_clipboard_lxx
                     ToolbarKey.NUMPAD -> R.drawable.sym_keyboard_numpad_key_lxx
                     ToolbarKey.UNDO -> R.drawable.ic_undo
-                    ToolbarKey.POLISH ->  R.drawable.ic_polish
+                    ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_lxx
                     ToolbarKey.REDO -> R.drawable.ic_redo
                     ToolbarKey.SETTINGS -> R.drawable.sym_keyboard_settings_lxx
                     ToolbarKey.SELECT_ALL -> R.drawable.ic_select_all
@@ -201,7 +201,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.ONE_HANDED -> R.drawable.sym_keyboard_start_onehanded_lxx
                     ToolbarKey.INCOGNITO -> R.drawable.sym_keyboard_incognito_lxx
                     ToolbarKey.AUTOCORRECT -> R.drawable.ic_autocorrect
-                    ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_lxx
+                    ToolbarKey.AI -> R.drawable.ic_polish
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_lxx
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left
@@ -253,7 +253,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.NUMPAD -> R.drawable.sym_keyboard_numpad_key_lxx
                     ToolbarKey.UNDO -> R.drawable.ic_undo_rounded
                     ToolbarKey.REDO -> R.drawable.ic_redo_rounded
-                    ToolbarKey.POLISH ->  R.drawable.ic_polish
+                    ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_rounded
                     ToolbarKey.SETTINGS -> R.drawable.sym_keyboard_settings_rounded
                     ToolbarKey.SELECT_ALL -> R.drawable.ic_select_all_rounded
                     ToolbarKey.SELECT_WORD -> R.drawable.ic_select_rounded
@@ -263,7 +263,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.ONE_HANDED -> R.drawable.sym_keyboard_start_onehanded_rounded
                     ToolbarKey.INCOGNITO -> R.drawable.sym_keyboard_incognito_lxx
                     ToolbarKey.AUTOCORRECT -> R.drawable.ic_autocorrect_rounded
-                    ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_rounded
+                    ToolbarKey.AI -> R.drawable.ic_polish
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close_rounded
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_rounded
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left_rounded

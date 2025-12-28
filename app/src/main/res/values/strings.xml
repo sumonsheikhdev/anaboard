@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     Copyright (C) 2008 The Android Open Source Project
     modified
     SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
@@ -321,15 +320,16 @@
     <!-- Title of the setting to set toolbar keys -->
     <string name="toolbar_keys">Select toolbar keys</string>
     <!-- Names of the toolbar keys-->
-    <string name="paste" tools:keep="@string/paste" translatable="false">@android:string/paste</string>
-    <string name="copy" tools:keep="@string/copy" translatable="false">@android:string/copy</string>
-    <string name="cut" tools:keep="@string/cut" translatable="false">@android:string/cut</string>
+    <string name="paste" translatable="false" tools:keep="@string/paste">@android:string/paste</string>
+    <string name="copy" translatable="false" tools:keep="@string/copy">@android:string/copy</string>
+    <string name="cut" translatable="false" tools:keep="@string/cut">@android:string/cut</string>
     <string name="clipboard" tools:keep="@string/clipboard">Clipboard</string>
+    <string name="ai" tools:keep="@string/ai">AI</string>
     <string name="clear_clipboard" tools:keep="@string/clear_clipboard">Clear clipboard</string>
     <string name="voice" tools:keep="@string/voice">Voice input</string>
-    <string name="numpad" tools:keep="@string/numpad" translatable="false">@string/layout_numpad</string>
+    <string name="numpad" translatable="false" tools:keep="@string/numpad">@string/layout_numpad</string>
     <string name="settings" tools:keep="@string/settings">Settings</string>
-    <string name="select_all" tools:keep="@string/select_all" translatable="false">@android:string/selectAll</string>
+    <string name="select_all" translatable="false" tools:keep="@string/select_all">@android:string/selectAll</string>
     <string name="select_word" tools:keep="@string/select_word">Select word</string>
     <string name="one_handed" tools:keep="@string/one_handed">One-handed mode</string>
     <string name="split" tools:keep="@string/split">Split keyboard</string>
@@ -520,6 +520,13 @@ language, hence "No language". -->
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Clipboard bottom row</string>
     <!-- Name for bottom row layout with action key in clipboard view -->
     <string name="layout_clip_bottom_row_with_action" tools:keep="@string/layout_clip_bottom_row_with_action">Clipboard bottom row with action key</string>
+    <string name="layout_ai_bottom_row" tools:keep="@string/layout_ai_bottom_row">AI bottom row</string>
+    <string name="ai_assistant">AI Assistant</string>
+    <string name="ai_improve_sentence">Improve Sentence</string>
+    <string name="ai_fix_grammar">Fix Grammar</string>
+    <string name="ai_translate">Translate</string>
+    <string name="ai_not_available">AI feature not available in this version</string>
+    <string name="ai_thinking">AI is thinking...</string>
     <!-- Title for customizing background image -->
     <string name="customize_background_image">Set background image</string>
     <!-- Title for customizing background image in landscape mode -->
@@ -858,7 +865,7 @@ New dictionary:
     <!-- Label for toolbar key, currently used only for showing the icon name -->
     <string name="label_toolbar_key" tools:keep="@string/label_toolbar_key">Show / hide toolbar</string>
     <!-- Label for language switch key, currently used only for showing the icon name -->
-    <string name="label_language_switch_key" tools:keep="@string/label_language_switch_key" translatable="false">@string/show_language_switch_key</string>
+    <string name="label_language_switch_key" translatable="false" tools:keep="@string/label_language_switch_key">@string/show_language_switch_key</string>
     <!-- Label for zero-width joiner key, currently used only for showing the icon name -->
     <string name="label_zwj_key" tools:keep="@string/label_zwj_key">Zero-width joiner</string>
     <!-- Label for zero-width non-joiner key, currently used only for showing the icon name -->

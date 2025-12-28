@@ -24,4 +24,11 @@
         <item name="android:textColorAlertDialogListItem">@color/foreground</item>
         <item name="android:colorForeground">@color/foreground</item>
     </style>
+
+    <style name="LoginActivityTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryDark">@color/action_bar_color</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/setup_background</item>
+    </style>
 </resources>

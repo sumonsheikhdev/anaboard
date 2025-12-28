@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "helium314.keyboard"
-        minSdk = 21
-        targetSdk = 35
+        applicationId = "dev.sumonsheikh.anaboard"
+        minSdk = 23
+        targetSdk = 36
         versionCode = 3603
         versionName = "3.6"
         ndk {
@@ -123,6 +123,10 @@ dependencies {
 
     // kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.activity:activity:1.12.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     // compose
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
