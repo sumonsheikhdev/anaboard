@@ -14,6 +14,7 @@ import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.Constants.Separators
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
+import helium314.keyboard.latin.utils.ToolbarKey.AI
 import helium314.keyboard.latin.utils.ToolbarKey.AUTOCORRECT
 import helium314.keyboard.latin.utils.ToolbarKey.CLEAR_CLIPBOARD
 import helium314.keyboard.latin.utils.ToolbarKey.CLIPBOARD
@@ -33,7 +34,6 @@ import helium314.keyboard.latin.utils.ToolbarKey.PAGE_END
 import helium314.keyboard.latin.utils.ToolbarKey.PAGE_START
 import helium314.keyboard.latin.utils.ToolbarKey.PAGE_UP
 import helium314.keyboard.latin.utils.ToolbarKey.PASTE
-import helium314.keyboard.latin.utils.ToolbarKey.POLISH
 import helium314.keyboard.latin.utils.ToolbarKey.REDO
 import helium314.keyboard.latin.utils.ToolbarKey.RIGHT
 import helium314.keyboard.latin.utils.ToolbarKey.SELECT_ALL
@@ -104,6 +104,7 @@ fun getCodeForToolbarKey(key: ToolbarKey) = Settings.getInstance().getCustomTool
     CLEAR_CLIPBOARD -> KeyCode.CLIPBOARD_CLEAR_HISTORY
     CLOSE_HISTORY -> KeyCode.ALPHA
     EMOJI -> KeyCode.EMOJI
+    AI -> KeyCode.AI
     LEFT -> KeyCode.ARROW_LEFT
     RIGHT -> KeyCode.ARROW_RIGHT
     UP -> KeyCode.ARROW_UP
@@ -117,7 +118,6 @@ fun getCodeForToolbarKey(key: ToolbarKey) = Settings.getInstance().getCustomTool
     PAGE_START -> KeyCode.MOVE_START_OF_PAGE
     PAGE_END -> KeyCode.MOVE_END_OF_PAGE
     SPLIT -> KeyCode.SPLIT_LAYOUT
-    POLISH -> KeyCode.POLISH
 }
 
 fun getCodeForToolbarKeyLongClick(key: ToolbarKey) = Settings.getInstance().getCustomToolbarLongpressCode(key) ?: when (key) {
@@ -142,9 +142,8 @@ fun getCodeForToolbarKeyLongClick(key: ToolbarKey) = Settings.getInstance().getC
 // names need to be aligned with resources strings (using lowercase of key.name)
 enum class ToolbarKey {
     VOICE, CLIPBOARD, NUMPAD, UNDO, REDO, SETTINGS, SELECT_ALL, SELECT_WORD, COPY, CUT, PASTE, ONE_HANDED, SPLIT,
-    INCOGNITO, AUTOCORRECT, CLEAR_CLIPBOARD, CLOSE_HISTORY, EMOJI, LEFT, RIGHT, UP, DOWN, WORD_LEFT, WORD_RIGHT,
-    PAGE_UP, PAGE_DOWN, FULL_LEFT, FULL_RIGHT, PAGE_START, PAGE_END,
-    POLISH
+    INCOGNITO, AUTOCORRECT, CLEAR_CLIPBOARD, CLOSE_HISTORY, EMOJI, AI, LEFT, RIGHT, UP, DOWN, WORD_LEFT, WORD_RIGHT,
+    PAGE_UP, PAGE_DOWN, FULL_LEFT, FULL_RIGHT, PAGE_START, PAGE_END
 }
 
 enum class ToolbarMode {
@@ -154,7 +153,7 @@ enum class ToolbarMode {
 val toolbarKeyStrings = entries.associateWithTo(EnumMap(ToolbarKey::class.java)) { it.toString().lowercase(Locale.US) }
 
 val defaultToolbarPref by lazy {
-    val default = listOf(POLISH, VOICE, CLIPBOARD, UNDO, REDO,  COPY, PASTE, LEFT, RIGHT)
+    val default = listOf(AI, VOICE, CLIPBOARD, UNDO, REDO, COPY, PASTE, LEFT, RIGHT)
     val others = entries.filterNot { it in default || it == CLOSE_HISTORY }
     default.joinToString(Separators.ENTRY) { it.name + Separators.KV + true } + Separators.ENTRY +
             others.joinToString(Separators.ENTRY) { it.name + Separators.KV + false }

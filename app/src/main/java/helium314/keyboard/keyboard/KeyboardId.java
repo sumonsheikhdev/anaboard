@@ -67,6 +67,8 @@ public final class KeyboardId {
     public static final int ELEMENT_NUMPAD = 28;
     public static final int ELEMENT_EMOJI_BOTTOM_ROW = 29;
     public static final int ELEMENT_CLIPBOARD_BOTTOM_ROW = 30;
+    public static final int ELEMENT_AI = 31;
+    public static final int ELEMENT_AI_BOTTOM_ROW = 32;
 
     public final RichInputMethodSubtype mSubtype;
     public final int mWidth;
@@ -206,7 +208,8 @@ public final class KeyboardId {
     }
 
     public boolean isEmojiClipBottomRow() {
-        return mElementId == ELEMENT_CLIPBOARD_BOTTOM_ROW || mElementId == ELEMENT_EMOJI_BOTTOM_ROW;
+        return mElementId == ELEMENT_CLIPBOARD_BOTTOM_ROW || mElementId == ELEMENT_EMOJI_BOTTOM_ROW
+                || mElementId == ELEMENT_AI_BOTTOM_ROW;
     }
 
     public int imeAction() {
@@ -288,6 +291,8 @@ public final class KeyboardId {
             case ELEMENT_EMOJI_CATEGORY16 -> "emojiCategory16";
             case ELEMENT_CLIPBOARD -> "clipboard";
             case ELEMENT_NUMPAD -> "numpad";
+            case ELEMENT_AI -> "ai";
+            case ELEMENT_AI_BOTTOM_ROW -> "aiBottomRow";
             default -> null;
         };
     }

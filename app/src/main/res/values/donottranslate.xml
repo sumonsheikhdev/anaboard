@@ -70,6 +70,6 @@
 
     <string name="english_ime_name" translatable="false">AnaBoard</string>
     <!-- App slogan-->
-    <string name="app_slogan" translatable="false">100% FOSS keyboard, based on AOSP.</string>
+    <string name="app_slogan" translatable="false">Free &amp; open-source keyboard based on HeliBoard (AOSP-derived)</string>
 
 </resources>
