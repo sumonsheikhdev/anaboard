@@ -44,6 +44,7 @@ import helium314.keyboard.keyboard.KeyboardActionListenerImpl;
 import helium314.keyboard.keyboard.emoji.EmojiPalettesView;
 import helium314.keyboard.keyboard.internal.KeyboardIconsSet;
 import helium314.keyboard.keyboard.internal.keyboard_parser.floris.KeyCode;
+import helium314.keyboard.keyboard.ai.OnAiActionListener;
 import helium314.keyboard.latin.common.InsetsOutlineProvider;
 import helium314.keyboard.dictionarypack.DictionaryPackConstants;
 import helium314.keyboard.event.Event;
@@ -99,7 +100,7 @@ import androidx.core.content.ContextCompat;
  * Input method implementation for Qwerty'ish keyboard.
  */
 public class LatinIME extends InputMethodService implements
-        SuggestionStripView.Listener, SuggestionStripViewAccessor,
+        OnAiActionListener, SuggestionStripView.Listener, SuggestionStripViewAccessor,
         DictionaryFacilitator.DictionaryInitializationListener {
     static final String TAG = LatinIME.class.getSimpleName();
     private static final boolean TRACE = false;
@@ -1802,4 +1803,56 @@ public View onCreateInputView() {
             // deallocateMemory always called on hiding, and should not be called when showing
         }
     }
+
+    @Override
+    public void onImproveText(@NonNull String text) {
+        // For now just show a log message
+        Log.i(TAG, "AI Improve Text requested: " + text);
+    }
+
+    @Override
+    public void onFixGrammar(@NonNull String text) {
+        Log.i(TAG, "AI Fix Grammar requested: " + text);
+    }
+
+    @Override
+    public void onTranslate(@NonNull String text, @NonNull String targetLanguage) {
+        Log.i(TAG, "AI Translate requested: " + text + " to " + targetLanguage);
+    }
+
+    @Override
+    public String onGetCurrentText() {
+        if (mInputLogic.mConnection.hasSelection()) {
+            CharSequence selectedText = mInputLogic.mConnection.getSelectedText(0);
+            if (selectedText != null) return selectedText.toString();
+        }
+        CharSequence textBefore = mInputLogic.mConnection.getTextBeforeCursor(1000, 0);
+        return textBefore != null ? textBefore.toString() : "";
+    }
+
+    @Override
+    public void onReplaceText(@NonNull String text) {
+        final android.view.inputmethod.InputConnection ic = getCurrentInputConnection();
+        if (ic == null) {
+            return;
+        }
+        
+        // Get all current text
+        CharSequence textBefore = ic.getTextBeforeCursor(100000, 0);
+        CharSequence textAfter = ic.getTextAfterCursor(100000, 0);
+        int beforeLength = textBefore != null ? textBefore.length() : 0;
+        int afterLength = textAfter != null ? textAfter.length() : 0;
+        
+        // Delete all existing text
+        if (beforeLength > 0 || afterLength > 0) {
+            ic.deleteSurroundingText(beforeLength, afterLength);
+        }
+        
+        // Insert the new text
+        ic.commitText(text, 1);
+    }
+
+
+
+
 }

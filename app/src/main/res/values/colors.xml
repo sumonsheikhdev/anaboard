@@ -73,4 +73,7 @@
 
     <!-- Scrollbar color -->
     <color name="toolbar_scrollbar">#66808080</color>
+
+    <color name="text_primary">#000</color>
+
 </resources>

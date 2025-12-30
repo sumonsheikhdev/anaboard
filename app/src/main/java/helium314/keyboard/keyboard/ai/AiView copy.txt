@@ -1,0 +1,485 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
+package helium314.keyboard.keyboard.ai;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import helium314.keyboard.ApiClient;
+import helium314.keyboard.AuthManager;
+import helium314.keyboard.LoginActivity;
+import helium314.keyboard.event.HapticEvent;
+import helium314.keyboard.keyboard.KeyboardActionListener;
+import helium314.keyboard.keyboard.internal.KeyDrawParams;
+import helium314.keyboard.keyboard.internal.KeyVisualAttributes;
+import helium314.keyboard.keyboard.internal.keyboard_parser.floris.KeyCode;
+import helium314.keyboard.latin.AudioAndHapticFeedbackManager;
+import helium314.keyboard.latin.R;
+import helium314.keyboard.latin.settings.Settings;
+import helium314.keyboard.latin.settings.SettingsValues;
+import helium314.keyboard.latin.utils.Log;
+import helium314.keyboard.latin.utils.ResourceUtils;
+import org.json.JSONObject;
+
+@SuppressLint("CustomViewStyleable")
+public class AiViewa extends LinearLayout implements View.OnClickListener {
+
+    private final AiLayoutParams aiLayoutParams;
+    private View aiBackButton;
+    private Spinner aiLanguageSpinner;
+    private Spinner aiToneSpinner;
+    private View aiInitialView;
+    private View aiFeatureListScroll;
+    private View aiResultsScroll;
+    private Button btnShowFeatures;
+    private Button btnLoginAi;
+
+    private ProgressBar aiLoadingProgress;
+    private RecyclerView aiResultsRecycler;
+    private AiResultAdapter aiResultAdapter;
+    private AuthManager authManager;
+    private ApiClient apiClient;
+
+    private KeyboardActionListener keyboardActionListener = KeyboardActionListener.EMPTY_LISTENER;
+    private boolean initialized = false;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private OnAiActionListener onAiActionListener;
+
+    private List<String> currentResults = Arrays.asList();
+    private String selectedLanguage = "English";
+    private String selectedTone = "Professional";
+
+    private final String[] languages = {"English", "Spanish", "French", "German", "Italian", "Portuguese", "Russian", "Chinese", "Japanese", "Korean", "Arabic", "Hindi", "Bengali", "Turkish", "Vietnamese"};
+    private final String[] tones = {"Professional", "Formal", "Technical", "Creative", "Friendly", "Persuasive", "Casual"};
+
+    public AiView(final Context context) {
+        this(context, null);
+    }
+
+    public AiView(final Context context, final AttributeSet attrs) {
+        this(context, attrs, R.attr.clipboardHistoryViewStyle);
+    }
+
+    public AiView(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs, defStyle);
+        aiLayoutParams = new AiLayoutParams(context.getResources());
+    }
+
+    public void setOnAiActionListener(final OnAiActionListener listener) {
+        this.onAiActionListener = listener;
+    }
+
+    @Override
+    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        final int width = ResourceUtils.getKeyboardWidth(getContext(), Settings.getValues())
+            + getPaddingLeft() + getPaddingRight();
+        final int height = ResourceUtils.getKeyboardWidth(getContext(),
+            Settings.getValues()) + getPaddingTop() + getPaddingBottom();
+        setMeasuredDimension(width, height);
+    }
+
+@SuppressLint("ClickableViewAccessibility")
+    private void initialize() {
+        if (initialized) return;
+
+        authManager = new AuthManager(getContext());
+        apiClient = new ApiClient(getContext());
+
+        aiBackButton = findViewById(R.id.ai_back_button);
+        aiLanguageSpinner = findViewById(R.id.ai_language_spinner);
+        aiToneSpinner = findViewById(R.id.ai_tone_spinner);
+        aiInitialView = findViewById(R.id.ai_initial_view);
+        aiFeatureListScroll = findViewById(R.id.ai_feature_list_scroll);
+        aiResultsScroll = findViewById(R.id.ai_results_scroll);
+        aiLoadingProgress = findViewById(R.id.ai_loading_progress);
+        aiResultsRecycler = findViewById(R.id.ai_results_recycler);
+        btnShowFeatures = findViewById(R.id.btn_show_features);
+        btnLoginAi = findViewById(R.id.btn_login_ai);
+
+        // Feature Items
+        findViewById(R.id.item_polish).setOnClickListener(this);
+        findViewById(R.id.item_grammar).setOnClickListener(this);
+        findViewById(R.id.item_explain).setOnClickListener(this);
+        findViewById(R.id.item_reply).setOnClickListener(this);
+        findViewById(R.id.item_translate).setOnClickListener(this);
+
+        // Set up RecyclerView
+        aiResultAdapter = new AiResultAdapter(result -> {
+            if (keyboardActionListener != null) {
+                keyboardActionListener.onTextInput(result);
+            }
+        });
+        aiResultsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        aiResultsRecycler.setAdapter(aiResultAdapter);
+
+        // Set up Language Spinner
+        setupSpinner(aiLanguageSpinner, languages, (lang) -> {
+            selectedLanguage = lang;
+        });
+
+        // Set up Tone Spinner
+        setupSpinner(aiToneSpinner, tones, (tone) -> {
+            selectedTone = tone;
+        });
+
+        if (aiBackButton != null) {
+            aiBackButton.setOnClickListener(v -> {
+                if (keyboardActionListener != null) {
+                    keyboardActionListener.onCodeInput(KeyCode.ALPHA, helium314.keyboard.latin.common.Constants.NOT_A_COORDINATE, helium314.keyboard.latin.common.Constants.NOT_A_COORDINATE, false);
+                }
+            });
+        }
+
+        if (btnShowFeatures != null) {
+            btnShowFeatures.setOnClickListener(v -> showFeatureList());
+        }
+
+        if (btnLoginAi != null) {
+            btnLoginAi.setVisibility(authManager.isLoggedIn() ? View.GONE : View.VISIBLE);
+            btnLoginAi.setOnClickListener(v -> {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
+            });
+        }
+
+        initialized = true;
+    }
+
+    private interface SpinnerSelectionListener {
+        void onSelected(String value);
+    }
+
+    private void setupSpinner(Spinner spinner, String[] items, SpinnerSelectionListener listener) {
+        if (spinner == null) return;
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, items) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                if (v instanceof TextView) {
+                    ((TextView) v).setTextColor(getResources().getColor(R.color.setup_text_title));
+                    ((TextView) v).setTextSize(12);
+                }
+                return v;
+            }
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                listener.onSelected(items[position]);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void showInitialView() {
+        aiInitialView.setVisibility(View.VISIBLE);
+        aiFeatureListScroll.setVisibility(View.GONE);
+        aiResultsScroll.setVisibility(View.GONE);
+        aiLoadingProgress.setVisibility(View.GONE);
+    }
+
+    private void showFeatureList() {
+        aiInitialView.setVisibility(View.GONE);
+        aiFeatureListScroll.setVisibility(View.VISIBLE);
+        aiResultsScroll.setVisibility(View.GONE);
+        aiLoadingProgress.setVisibility(View.GONE);
+    }
+
+    private void showResults() {
+        aiInitialView.setVisibility(View.GONE);
+        aiFeatureListScroll.setVisibility(View.GONE);
+        aiResultsScroll.setVisibility(View.VISIBLE);
+        aiLoadingProgress.setVisibility(View.GONE);
+    }
+
+
+    public void setHardwareAcceleratedDrawingEnabled(final boolean enabled) {
+        if (!enabled) return;
+        setLayerType(LAYER_TYPE_HARDWARE, null);
+    }
+
+    public void startAiView(
+        final KeyVisualAttributes keyVisualAttr,
+        final EditorInfo editorInfo,
+        final KeyboardActionListener keyboardActionListener) {
+        this.keyboardActionListener = keyboardActionListener;
+        initialize();
+        showInitialView();
+
+        final KeyDrawParams params = new KeyDrawParams();
+        params.updateParams(aiLayoutParams.getBottomRowKeyboardHeight(), keyVisualAttr);
+        final Settings settings = Settings.getInstance();
+        if (settings.getCustomTypeface() != null) {
+            params.mTypeface = settings.getCustomTypeface();
+        }
+
+        setupButtonStyles(params);
+        setupSidePadding();
+    }
+
+    private void setupButtonStyles(final KeyDrawParams params) {
+        // Not used with new layouts but keeping method for potential future use
+    }
+
+    private void setupSidePadding() {
+        // Padding is now handled by XML
+    }
+
+    public void stopAiView() {
+        if (!initialized) return;
+        // Cleanup if needed
+    }
+
+    @Override
+    public void onClick(final View view) {
+        AudioAndHapticFeedbackManager.getInstance().performHapticAndAudioFeedback(
+            KeyCode.NOT_SPECIFIED, this, HapticEvent.KEY_PRESS);
+
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(getContext(), "Please login to Analysa Account", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+            return;
+        }
+
+        String text = onAiActionListener != null ? onAiActionListener.onGetCurrentText() : "";
+        if (text == null || text.trim().isEmpty()) {
+            Toast.makeText(getContext(), "Type or select some text first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final int id = view.getId();
+        String lngCode = getLanguageCode(selectedLanguage);
+        if (id == R.id.item_polish) {
+            performPolish(text, selectedTone.toLowerCase(), lngCode);
+        } else if (id == R.id.item_grammar) {
+            performGrammarFix(text, lngCode);
+        } else if (id == R.id.item_explain) {
+            performExplain(text, lngCode);
+        } else if (id == R.id.item_reply) {
+            performReply(text, selectedTone.toLowerCase(), lngCode);
+        } else if (id == R.id.item_translate) {
+            translateResults(Arrays.asList(text)); // Direct translate of input
+        }
+    }
+
+    private void performExplain(String text, String lng) {
+        showLoading(true);
+        apiClient.explain(text, lng, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                handleAiResponse(response);
+            }
+            @Override
+            public void onError(String message) {
+                handleAiError(message);
+            }
+        });
+    }
+
+    private void performReply(String text, String tone, String lng) {
+        showLoading(true);
+        apiClient.reply(text, tone, lng, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                handleAiResponse(response);
+            }
+            @Override
+            public void onError(String message) {
+                handleAiError(message);
+            }
+        });
+    }
+
+    private void performPolish(String text, String style, String lng) {
+        showLoading(true);
+        apiClient.polish(text, style, lng, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                handleAiResponse(response);
+            }
+
+            @Override
+            public void onError(String message) {
+                handleAiError(message);
+            }
+        });
+    }
+
+    private void performGrammarFix(String text, String lng) {
+        showLoading(true);
+        apiClient.grammarFix(text, lng, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                handleAiResponse(response);
+            }
+
+            @Override
+            public void onError(String message) {
+                handleAiError(message);
+            }
+        });
+    }
+
+    private void handleAiResponse(JSONObject response) {
+        handler.post(() -> {
+            showLoading(false);
+            // Assuming response has "data" array of strings or similar
+            // Let's check typical response format from summary
+            // summary says: JSONObject data = jsonResponse.optJSONObject("data");
+            // but for AI it might be different. Let's assume it's an array of strings in "data" or "results"
+            List<String> results = new ArrayList<>();
+            try {
+                if (response.has("data")) {
+                    Object data = response.get("data");
+                    if (data instanceof org.json.JSONArray) {
+                        org.json.JSONArray array = (org.json.JSONArray) data;
+                        for (int i = 0; i < array.length(); i++) {
+                            results.add(array.getString(i));
+                        }
+                    } else if (data instanceof String) {
+                        results.add((String) data);
+                    }
+                } else if (response.has("result")) {
+                    results.add(response.getString("result"));
+                }
+            } catch (Exception e) {
+                Log.e("AiView", "Error parsing response", e);
+            }
+
+            if (results.isEmpty()) {
+                results.add("No results found");
+            }
+
+            currentResults = results;
+            showResults();
+
+            // If language is not English, we should probably translate
+            if (!selectedLanguage.equals("English")) {
+                translateResults(results);
+            } else {
+                aiResultAdapter.setResults(results);
+            }
+        });
+    }
+
+    private void translateResults(List<String> results) {
+        // For simplicity, just translate the results joined by a delimiter
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < results.size(); i++) {
+            sb.append(results.get(i));
+            if (i < results.size() - 1) {
+                sb.append("\n---\n");
+            }
+        }
+        String textToTranslate = sb.toString();
+        apiClient.translate(textToTranslate, getLanguageCode(selectedLanguage), new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                handler.post(() -> {
+                    try {
+                        String translated = response.optString("data", "");
+                        if (translated.isEmpty()) translated = response.optString("result", "");
+
+                        if (!translated.isEmpty()) {
+                            aiResultAdapter.setResults(Arrays.asList(translated.split("\n---\n")));
+                        } else {
+                            aiResultAdapter.setResults(results);
+                        }
+                    } catch (Exception e) {
+                        aiResultAdapter.setResults(results);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                handler.post(() -> aiResultAdapter.setResults(results));
+            }
+        });
+    }
+
+    private void handleAiError(String message) {
+        handler.post(() -> {
+            showLoading(false);
+            Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void showLoading(boolean show) {
+        handler.post(() -> {
+            aiLoadingProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+            if (show) {
+                aiInitialView.setVisibility(View.GONE);
+                aiFeatureListScroll.setVisibility(View.GONE);
+                aiResultsScroll.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private String getLanguageCode(String language) {
+        switch (language) {
+            case "English": return "en";
+            case "Spanish": return "es";
+            case "French": return "fr";
+            case "German": return "de";
+            case "Italian": return "it";
+            case "Portuguese": return "pt";
+            case "Russian": return "ru";
+            case "Chinese": return "zh";
+            case "Japanese": return "ja";
+            case "Korean": return "ko";
+            case "Arabic": return "ar";
+            case "Hindi": return "hi";
+            case "Bengali": return "bn";
+            case "Turkish": return "tr";
+            case "Vietnamese": return "vi";
+            default: return "en";
+        }
+    }
+
+    private String getCurrentInputText() {
+        return onAiActionListener != null ? onAiActionListener.onGetCurrentText() : "";
+    }
+
+    private void showToast(final String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void setKeyboardActionListener(final KeyboardActionListener listener) {
+        this.keyboardActionListener = listener;
+    }
+}
