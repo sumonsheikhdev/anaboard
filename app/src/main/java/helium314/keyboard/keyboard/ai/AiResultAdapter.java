@@ -32,6 +32,12 @@ public class AiResultAdapter extends RecyclerView.Adapter<AiResultAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    public void reset() {
+        results.clear();
+        notifyDataSetChanged();
+    }
+
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

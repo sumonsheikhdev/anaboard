@@ -14,8 +14,8 @@ android {
         applicationId = "dev.sumonsheikh.anaboard"
         minSdk = 23
         targetSdk = 36
-        versionCode = 3603
-        versionName = "3.6"
+        versionCode = 3700
+        versionName = "3.7"
         ndk {
             abiFilters.clear()
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
@@ -39,7 +39,7 @@ android {
         debug {
             // "normal" debug has minify for smaller APK to fit the GitHub 25 MB limit when zipped
             // and for better performance in case users want to install a debug APK
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             isJniDebuggable = false
             applicationIdSuffix = ".debug"
         }

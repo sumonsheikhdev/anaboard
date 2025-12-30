@@ -1,183 +1,188 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-    SPDX-License-Identifier: GPL-3.0-only
-
-    android:visibility="gone"
--->
-<helium314.keyboard.keyboard.ai.AiView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<helium314.keyboard.keyboard.ai.AiView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_gravity="bottom"
-    android:background="@android:color/transparent"
+    android:background="@color/keyboard_background"
     android:orientation="vertical"
-    android:visibility="gone">
+    android:visibility="visible">
 
-
+    <!-- Header Section -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="56dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
 
         <LinearLayout
             android:id="@+id/ai_back_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="10dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/outline_arrow_back_24"
-                app:tint="@color/text_primary" />
+                android:tint="@color/text_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ai_assistant"
+                android:layout_marginStart="8dp"
+                android:text="Analysa AI"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/selector_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ai_chip_bg"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="2dp">
+
+            <ImageView
+                android:id="@+id/selector_icon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:alpha="0.7"
+                android:src="@drawable/tune_24dp"
+                android:tint="@color/text_primary" />
+
+            <Spinner
+                android:id="@+id/ai_selector_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:background="@android:color/transparent"
+                android:dropDownWidth="140dp"
+                android:gravity="center_vertical"
+                android:minWidth="80dp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Feature Bar -->
+    <HorizontalScrollView
+        android:id="@+id/ai_buttons_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/translate"
-                app:tint="@color/text_primary" />
-            <Spinner
-                android:id="@+id/ai_language_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/translate_bg"
-                android:padding="5dp" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp">
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp">
 
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Login"
-                android:backgroundTint="#3F51B5"
-                android:textAllCaps="false"
-                android:textColor="#fff" />
+            <TextView
+                android:id="@+id/btn_translate"
+                style="@style/AiChipStyle"
+                android:text="🌍 Translate"
+                app:drawableStartCompat="@drawable/translate" />
 
-            <Button
-                android:id="@+id/btn_rephrase"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:backgroundTint="#3F51B5"
-                android:layout_marginStart="10dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Rephrase"
-                android:textAllCaps="false"
-                android:textColor="#fff" />
+            <TextView
+                android:id="@+id/btn_polish"
+                style="@style/AiChipStyle"
+                android:text="✨ Polish"
+                app:drawableStartCompat="@drawable/ic_polish" />
 
-            <Button
+            <TextView
                 android:id="@+id/btn_fix_grammar"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:backgroundTint="#3F51B5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Grammar Fix"
-                android:textAllCaps="false"
-                android:textColor="#fff" />
+                style="@style/AiChipStyle"
+                android:text="✍️ Grammar"
+                app:drawableStartCompat="@drawable/ic_autocorrect_rounded" />
 
-            <Button
-                android:id="@+id/btn_add_emojis"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:backgroundTint="#3F51B5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Add emojis"
-                android:textAllCaps="false"
-                android:textColor="#fff" />
+            <TextView
+                android:id="@+id/btn_explain"
+                style="@style/AiChipStyle"
+                android:text="💡 Explain"
+                app:drawableStartCompat="@drawable/outline_award_star_24" />
 
-            <Button
-                android:id="@+id/btn_realistic"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:backgroundTint="#3F51B5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Realistic"
-                android:textAllCaps="false"
-                android:textColor="#fff" />
-
+            <TextView
+                android:id="@+id/btn_reply"
+                style="@style/AiChipStyle"
+                android:text="💬 Reply"
+                app:drawableStartCompat="@drawable/sym_keyboard_send_rounded" />
 
         </LinearLayout>
     </HorizontalScrollView>
 
-    <FrameLayout
+    <!-- Results View -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ai_results_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        android:visibility="gone"
+        tools:itemCount="3"
+        tools:listitem="@layout/ai_result_item" />
 
-        <ScrollView
-            android:id="@+id/ai_actions_scroll"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+    <!-- Welcome / Initial View -->
+    <LinearLayout
+        android:id="@+id/ai_initial_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-            <LinearLayout
-                android:id="@+id/ai_actions_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+        <View
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/outline_award_star_24"
+            android:backgroundTint="@color/text_primary"
+            android:alpha="0.3" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/ai_results_recycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/ai_result_item"
-                    tools:itemCount="5"/>
-
-            </LinearLayout>
-        </ScrollView>
-
-        <ProgressBar
-            android:id="@+id/ai_loading_progress"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone" />
-    </FrameLayout>
+            android:layout_marginTop="5dp"
+            android:text="Ready to perfect your text?"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.6"
+            android:text="Paste or select text and use the features above to start transforming."
+            android:textAlignment="center"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:lineSpacingMultiplier="1.2" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/ai_loading_progress"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        android:indeterminateTint="@color/accent"
+        android:visibility="gone" />
+
 
 </helium314.keyboard.keyboard.ai.AiView>

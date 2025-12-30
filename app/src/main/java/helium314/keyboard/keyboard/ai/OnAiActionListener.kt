@@ -20,4 +20,15 @@ interface OnAiActionListener {
      * Called when user requests to translate text
      */
     fun onTranslate(text: String, targetLanguage: String = "en")
+
+    /**
+     * Get the current text from the editor
+     */
+    fun onGetCurrentText(): String
+
+    /**
+     * Replace the current text in the input field
+     */
+    fun onReplaceText(text: String)
+
 }
