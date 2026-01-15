@@ -37,10 +37,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Analysa AI"
+                android:text="AnaBoard"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:fontFamily="sans-serif-medium" />
+            <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginStart="8dp"
+               android:layout_marginTop="2dp"
+               android:text="by Analysa"
+               android:textColor="@color/text_secondary"
+               android:textSize="12sp"
+               android:fontFamily="sans-serif" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -89,7 +99,10 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp">
-
+            <TextView
+                android:id="@+id/btn_ask"
+                style="@style/AiChipStyle"
+                android:text="🧠 Ask" />
             <TextView
                 android:id="@+id/btn_translate"
                 style="@style/AiChipStyle"

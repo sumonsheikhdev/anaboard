@@ -181,4 +181,17 @@ public class ApiClient {
             callback.onError(e.getMessage());
         }
     }
+
+
+    public void ask(String text, String lng, ApiCallback callback) {
+        try {
+            JSONObject params = new JSONObject();
+            params.put("text", text);
+            params.put("lng", lng);
+            post("/api/ai/ask", params, callback);
+        } catch (Exception e) {
+            callback.onError(e.getMessage());
+        }
+    }
+
 }

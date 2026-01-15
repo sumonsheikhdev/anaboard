@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import helium314.keyboard.ApiClient;
@@ -63,7 +64,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     private static final String[] LANGUAGES = {"Bangla", "English", "Hindi", "Arabic", "Spanish", "French", "Urdu"};
     private static final String[] TONES = {"Polite", "Professional", "Friendly", "Casual", "Formal", "Direct", "Short", "Supportive"};
     private static final String[] STYLES = {"Professional", "Casual", "Friendly", "Formal", "Simple", "Academic"};
-
+    private final List<String> languageList = new ArrayList<>();
     // UI Components
     private final AiLayoutParams aiLayoutParams;
     private View aiBackButton;
@@ -71,7 +72,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     private Spinner ai_selector_spinner;
     private View aiInitialView;
     private View selector_layout;
-    private TextView btn_translate, btn_polish, btn_fix_grammar, btn_explain, btn_reply;
+    private TextView btn_ask, btn_translate, btn_polish, btn_fix_grammar, btn_explain, btn_reply;
     private ProgressBar aiLoadingProgress;
     private RecyclerView aiResultsRecycler;
     private AiResultAdapter aiResultAdapter;
@@ -85,6 +86,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
 
     // State
     private boolean initialized = false;
+    private boolean autoDetectDone = false;
     private boolean isSettingUpSpinner = false;
     private String selectedLanguage = DEFAULT_LANGUAGE;
     private String selectedTone = DEFAULT_TONE;
@@ -124,12 +126,19 @@ public class AiView extends LinearLayout implements View.OnClickListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initialize() {
+
         if (initialized) return;
+
 
         // Initialize managers
         authManager = new AuthManager(getContext());
         apiClient = new ApiClient(getContext());
+        String savedLang = authManager.getTranslatedLanguage();
+        selectedLanguage = !TextUtils.isEmpty(savedLang)
+            ? savedLang
+            : DEFAULT_LANGUAGE;
 
+        rebuildLanguageList();
         // Set up 401 unauthorized listener
         apiClient.setUnauthorizedListener(() -> handler.post(() -> {
             Toast.makeText(getContext(), "Session expired. Please login again.", Toast.LENGTH_LONG).show();
@@ -158,6 +167,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
         aiLoadingProgress = findViewById(R.id.ai_loading_progress);
         aiResultsRecycler = findViewById(R.id.ai_results_recycler);
         selector_layout = findViewById(R.id.selector_layout);
+        btn_ask = findViewById(R.id.btn_ask);
         btn_translate = findViewById(R.id.btn_translate);
         btn_polish = findViewById(R.id.btn_polish);
         btn_fix_grammar = findViewById(R.id.btn_fix_grammar);
@@ -166,6 +176,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     }
 
     private void setupClickListeners() {
+        btn_ask.setOnClickListener(this);
         btn_translate.setOnClickListener(this);
         btn_polish.setOnClickListener(this);
         btn_fix_grammar.setOnClickListener(this);
@@ -204,27 +215,41 @@ public class AiView extends LinearLayout implements View.OnClickListener {
         void onSelected(String value);
     }
 
-    private void setupSpinner(Spinner spinner, String[] items, SpinnerSelectionListener listener) {
+    private void setupSpinner(
+        Spinner spinner,
+        List<String> items,
+        String selectedValue,
+        SpinnerSelectionListener listener
+    ) {
         if (spinner == null) return;
 
         isSettingUpSpinner = true;
-        ArrayAdapter<String> adapter = createSpinnerAdapter(items);
+
+        ArrayAdapter<String> adapter = createSpinnerAdapter(
+            items.toArray(new String[0])
+        );
         spinner.setAdapter(adapter);
+
+        // 🔥 FORCE correct default BEFORE listener fires
+        int index = items.indexOf(selectedValue);
+        if (index >= 0) {
+            spinner.setSelection(index, false);
+        }
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!isSettingUpSpinner) {
-                    listener.onSelected(items[position]);
+                if (!isSettingUpSpinner ) {
+                    listener.onSelected(items.get(position));
                 }
                 isSettingUpSpinner = false;
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No action needed
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
+
 
     @NonNull
     private ArrayAdapter<String> createSpinnerAdapter(String[] items) {
@@ -267,7 +292,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
         initialize();
         showInitialView();
         resetUi();
-
+        autoDetectDone = false;
         final KeyDrawParams params = new KeyDrawParams();
         final Settings settings = Settings.getInstance();
         if (settings.getCustomTypeface() != null) {
@@ -283,7 +308,11 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     }
 
     private void resetUi() {
-        selectedLanguage = DEFAULT_LANGUAGE;
+        String savedLang = authManager.getTranslatedLanguage();
+        selectedLanguage = !TextUtils.isEmpty(savedLang)
+            ? savedLang
+            : DEFAULT_LANGUAGE;
+
         selectedTone = DEFAULT_TONE;
         selectedStyle = DEFAULT_STYLE;
         currentSelectorMode = "";
@@ -295,6 +324,7 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     }
 
     private void resetButtonStates() {
+        btn_ask.setSelected(false);
         btn_translate.setSelected(false);
         btn_polish.setSelected(false);
         btn_fix_grammar.setSelected(false);
@@ -328,8 +358,9 @@ public class AiView extends LinearLayout implements View.OnClickListener {
 
         aiResultAdapter.reset();
         resetButtonStates();
-
-        if (selectorId == R.id.btn_translate) {
+        if (selectorId == R.id.btn_ask) {
+            handleAsk();
+        } else if (selectorId == R.id.btn_translate) {
             handleTranslate();
         } else if (selectorId == R.id.btn_polish) {
             handlePolish();
@@ -342,13 +373,93 @@ public class AiView extends LinearLayout implements View.OnClickListener {
         }
     }
 
+
+    private void handleAsk() {
+    updateSelector("language");
+    setChipSelected(btn_ask);
+
+    String text = getTextForTranslation();
+    if (TextUtils.isEmpty(text.trim())) {
+        Toast.makeText(getContext(), "Type or copy something to ask", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    performAsk(text, selectedLanguage);
+}
+
+
+    private void performAsk(String text, String lng) {
+        showLoading(true);
+        apiClient.ask(text, lng, createApiCallback());
+    }
     private void handleTranslate() {
         updateSelector("language");
         setChipSelected(btn_translate);
-        String text = getClipboardText();
-        if (!text.trim().isEmpty()) {
-            translate(text, selectedLanguage);
+
+        String text = getTextForTranslation();
+
+        if (TextUtils.isEmpty(text.trim())) {
+            Toast.makeText(getContext(), "Type or copy some text to translate", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // 🔥 AUTO-DETECT ONLY ONCE
+        if (!autoDetectDone) {
+            autoDetectDone = true;
+            if (!isEnglishDominant(text)) {
+                selectedLanguage = "English";
+                setSpinnerSelection(ai_selector_spinner, languageList, selectedLanguage);
+            }
+        }
+        translate(text, selectedLanguage);
+    }
+    private void setSpinnerSelection(Spinner spinner, List<String> items, String value) {
+        if (spinner == null || value == null) return;
+
+        int index = items.indexOf(value);
+        if (index >= 0) {
+            isSettingUpSpinner = true;
+            spinner.setSelection(index, false);
+        }
+    }
+
+
+    private boolean isEnglishDominant(String text) {
+        if (TextUtils.isEmpty(text)) return false;
+
+        int englishCount = 0;
+        int otherCount = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            // Ignore non-letters
+            if (!Character.isLetter(c)) continue;
+
+            // English letters only: A–Z, a–z
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                englishCount++;
+            } else {
+                otherCount++;
+            }
+        }
+
+        if (englishCount == 0) return false;
+
+        // 🔥 dominance rule (tune if needed)
+        return englishCount >= otherCount * 2;
+    }
+
+
+    private String getTextForTranslation() {
+        // 1. Try current input text first
+        String inputText = getCurrentInputText();
+        if (!TextUtils.isEmpty(inputText.trim())) {
+            return inputText;
+        }
+
+        // 2. Fallback to clipboard text
+        return getClipboardText();
     }
 
     private void handlePolish() {
@@ -378,11 +489,26 @@ public class AiView extends LinearLayout implements View.OnClickListener {
     private void handleExplain() {
         updateSelector("language");
         setChipSelected(btn_explain);
-        String text = getClipboardText();
-        if (!text.trim().isEmpty()) {
-            performExplain(text, selectedLanguage);
+
+        String text = getTextForTranslation(); // input → clipboard fallback
+
+        if (TextUtils.isEmpty(text.trim())) {
+            Toast.makeText(getContext(), "Type or copy some text to explain", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // 🔥 AUTO-DETECT ONLY ONCE
+        if (!autoDetectDone) {
+            autoDetectDone = true;
+
+            if (!isEnglishDominant(text)) {
+                selectedLanguage = "English";
+                setSpinnerSelection(ai_selector_spinner, languageList, selectedLanguage);
+            }
+        }
+        performExplain(text, selectedLanguage);
     }
+
 
     private void handleReply() {
         updateSelector("tone");
@@ -393,10 +519,29 @@ public class AiView extends LinearLayout implements View.OnClickListener {
             performReply(text, selectedTone);
         }
     }
+    private void rebuildLanguageList() {
+        languageList.clear();
+        languageList.addAll(Arrays.asList(LANGUAGES));
+
+        // 1️⃣ Resolve effective language
+        String lang = authManager != null
+            ? authManager.getTranslatedLanguage()
+            : null;
+
+        if (TextUtils.isEmpty(lang)) {
+            lang = DEFAULT_LANGUAGE;
+        }
+
+        // 2️⃣ Ensure it exists in the list
+        if (!languageList.contains(lang)) {
+            languageList.add(0, lang);
+        }
+    }
+
 
     private void updateSelector(String mode) {
-        if (mode.isEmpty()) {
-            currentSelectorMode = mode;
+        if (TextUtils.isEmpty(mode)) {
+            currentSelectorMode = "";
             selector_layout.setVisibility(GONE);
             return;
         }
@@ -406,27 +551,49 @@ public class AiView extends LinearLayout implements View.OnClickListener {
         }
 
         currentSelectorMode = mode;
+
         switch (mode) {
             case "language":
                 selector_icon.setImageResource(R.drawable.translate);
-                setupSpinner(ai_selector_spinner, LANGUAGES, lang -> {
-                    selectedLanguage = lang;
-                    handleAiFeature();
-                });
+
+                setupSpinner(
+                    ai_selector_spinner,
+                    languageList,
+                    selectedLanguage,
+                    lang -> {
+                        selectedLanguage = lang;
+                        authManager.saveTranslatedLanguage(lang);
+                        handleAiFeature();
+                    }
+                );
                 break;
+
             case "tone":
                 selector_icon.setImageResource(R.drawable.tune_24dp);
-                setupSpinner(ai_selector_spinner, TONES, tone -> {
-                    selectedTone = tone;
-                    handleAiFeature();
-                });
+
+                setupSpinner(
+                    ai_selector_spinner,
+                    Arrays.asList(TONES),
+                    selectedTone,
+                    tone -> {
+                        selectedTone = tone;
+                        handleAiFeature();
+                    }
+                );
                 break;
+
             case "style":
                 selector_icon.setImageResource(R.drawable.masked_transitions);
-                setupSpinner(ai_selector_spinner, STYLES, style -> {
-                    selectedStyle = style;
-                    handleAiFeature();
-                });
+
+                setupSpinner(
+                    ai_selector_spinner,
+                    Arrays.asList(STYLES),
+                    selectedStyle,
+                    style -> {
+                        selectedStyle = style;
+                        handleAiFeature();
+                    }
+                );
                 break;
         }
 

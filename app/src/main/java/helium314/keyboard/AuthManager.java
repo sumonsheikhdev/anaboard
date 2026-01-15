@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 public class AuthManager {
     private static final String PREF_NAME = "auth_prefs";
     private static final String KEY_TOKEN = "auth_token";
+    private static final String KEY_TRANSLATED_LANGUAGE = "translated_language";
+
 
     private final SharedPreferences prefs;
     private final Context context;
@@ -24,6 +26,14 @@ public class AuthManager {
     public AuthManager(Context context) {
         this.context = context.getApplicationContext();
         this.prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public void saveTranslatedLanguage(String language) {
+        prefs.edit().putString(KEY_TRANSLATED_LANGUAGE, language).apply();
+    }
+
+    public String getTranslatedLanguage() {
+        return prefs.getString(KEY_TRANSLATED_LANGUAGE, "English"); // default fallback
     }
 
     public void saveToken(String token) {
@@ -68,7 +78,19 @@ public class AuthManager {
                         JSONObject data = jsonResponse.optJSONObject("data");
                         int id = (data != null) ? data.optInt("id", -1) : -1;
                         String token = jsonResponse.optString("token", "");
+
+                        if (token.isEmpty()) {
+                            callback.onError("Invalid token received");
+                            return;
+                        }
+
                         saveToken(token);
+
+                        if (data != null) {
+                            String translatedLanguage = data.optString("translated_language", "English");
+                            saveTranslatedLanguage(translatedLanguage);
+                        }
+
                         callback.onSuccess(id, token);
                     } else {
                         callback.onError(message);

@@ -46,7 +46,7 @@ object Defaults {
     const val PREF_ICON_STYLE = KeyboardTheme.STYLE_MATERIAL
     const val PREF_THEME_COLORS = KeyboardTheme.THEME_LIGHT
     const val PREF_THEME_COLORS_NIGHT = KeyboardTheme.THEME_DARK
-    const val PREF_THEME_KEY_BORDERS = false
+    const val PREF_THEME_KEY_BORDERS = true
     @JvmField
     val PREF_THEME_DAY_NIGHT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     const val PREF_CUSTOM_ICON_NAMES = ""
@@ -60,7 +60,7 @@ object Defaults {
     const val PREF_SHOW_EMOJI_DESCRIPTIONS = true
     @JvmField
     var PREF_POPUP_ON = true
-    const val PREF_AUTO_CORRECTION = true
+    const val PREF_AUTO_CORRECTION = false
     const val PREF_MORE_AUTO_CORRECTION = false
     const val PREF_AUTO_CORRECT_THRESHOLD = 0.185f
     const val PREF_AUTOCORRECT_SHORTCUTS = true
@@ -163,7 +163,7 @@ object Defaults {
     const val PREF_ABC_AFTER_SYMBOL_SPACE = true
     const val PREF_ABC_AFTER_NUMPAD_SPACE = false
     const val PREF_REMOVE_REDUNDANT_POPUPS = false
-    const val PREF_SPACE_BAR_TEXT = ""
+    const val PREF_SPACE_BAR_TEXT = "ANALYSA"
     const val PREF_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss"
     const val PREF_EMOJI_RECENT_KEYS = ""
     const val PREF_LAST_SHOWN_EMOJI_CATEGORY_PAGE_ID = 0

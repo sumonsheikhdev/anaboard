@@ -17,11 +17,15 @@ class AiLayoutParams(res: Resources) {
 
     init {
         val sv = Settings.getValues()
-        // The main keyboard height consists of the keys area + the suggestions strip area.
-        // Secondary keyboards (like AI) hide the strip, so we must add its height back to match the total.
+
         val keyboardHeight = ResourceUtils.getKeyboardHeight(res, sv)
-        val stripHeight = res.getDimensionPixelSize(R.dimen.config_suggestions_strip_height)
-        
-        totalKeyboardHeight = keyboardHeight + stripHeight
+        val stripHeight =
+            res.getDimensionPixelSize(R.dimen.ai_keyboard_suggestion_height)
+
+        val extraAiHeight =
+            res.getDimensionPixelSize(R.dimen.ai_keyboard_extra_height)
+
+        totalKeyboardHeight = keyboardHeight + stripHeight + extraAiHeight
     }
 }
+
